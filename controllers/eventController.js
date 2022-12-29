@@ -22,60 +22,6 @@ const createEvent = asyncHandler(async (req,res) => {
     }
 })
 
-const addParticipant = async (req, res) => {
-    const id = req.params.id;
-    console.log(id, req.body.name)
-    const result = await Event.findOne({ _id: id });
-    result.currentParticipants.push(req.body.name);
-    result.save();
-
-    await User.findOneAndUpdate({ username: req.body.name }, { $push: { participated: result._id } });
-    res.send(result);
-}
-
-const getSingleEvent = async (req, res) => {
-    const id = req.params.id;
-    const result = await Event.findOne({ _id: id });
-    res.send(result);
-}
-
-const addPending = async (req, res) => {
-    const id = req.params.id;
-    const result = await Event.findOne({ _id: id });
-    result.pending.push(req.body.name);
-    result.save()
-
-    await User.findOneAndUpdate({ username: req.body.name }, { $push: { pending: result._id } });
-
-    res.send(result);
-}
-
-const myEvents = async (req, res) => {
-    const id = req.params.id;
-    const user = await User.findOne({ _id: id }).populate("myEvents").populate("participated").populate("pending");
-    res.send(user);
-}
-
-const getEvents = async (req, res) => {
-    const username = req.params.username;
-    const event = await Event.find({ createdBy: { $nin: username } });
-    res.send(event);
-}
-
-const deletPending = async (req, res) => {
-    const id = req.params.id;
-    const name = req.params.name;
-    const event = await Event.updateOne({ _id: id },
-        {
-            $pull: { pending: name }
-        }
-    )
-
-    await User.findOneAndUpdate({ username: name }, { $pull: { pending: id } });
-
-    res.send(event);
-}
-
 
 const getUserInfo = asyncHandler(async (req,res)=> {
     try {
@@ -160,6 +106,10 @@ const getEventJoinStatus = asyncHandler(async (req,res)=> {
         }
         if(user.participated.includes(eventId)) {
             return res.status(200).json("Participated");
+        }
+        const event = await Event.findById(eventId);
+        if(new Date(event.startDate) < Date.now()) {
+            return res.status(200).json('Past Event');
         }
         return res.status(200).json("Request to Join");
     } catch (error) {
