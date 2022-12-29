@@ -121,6 +121,15 @@ const getMyPendingEvents = asyncHandler(async (req,res) => {
     }
 })
 
+const getParticipatedEvents = asyncHandler(async(req,res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({error:error.message})
+    }
+})
+
 const requestToJoin = asyncHandler(async (req,res)=> {
     try {
         const {eventId} = req.params;
@@ -174,4 +183,4 @@ const cancelJoinEvent = asyncHandler(async (req,res) => {
 })
 
 
-module.exports = { createEvent,getAllEvents,getMyEvents,getEventJoinStatus,requestToJoin,cancelJoinEvent,getMyPendingEvents,getUserInfo}
+module.exports = { createEvent,getAllEvents,getMyEvents,getEventJoinStatus,requestToJoin,cancelJoinEvent,getMyPendingEvents,getUserInfo,getParticipatedEvents}
