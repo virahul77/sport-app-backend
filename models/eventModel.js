@@ -52,7 +52,7 @@ const eventSchema = new mongoose.Schema({
     pending: [{type:mongoose.Schema.Types.ObjectId,ref:'users'}],
     startDate: Date,
     venue: String
-})
+},{strict:false})
 
 
 const Event = mongoose.model('events',eventSchema);

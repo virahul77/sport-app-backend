@@ -47,8 +47,10 @@ const getAllEvents = asyncHandler(async (req,res)=> {
 const getSingleEventDetail = asyncHandler(async (req,res) => {
     try {
         const {eventId} = req.params;
-        const event = await Event.findById(eventId);
-        res.status(200).json(event);
+        const event = await Event.findById(eventId).populate({path:'createdBy',select:'username'}).populate({path:'currentParticipants',select:'username'});
+        const participated = !!event.currentParticipants.find(user=>user._id.toString()===req.user._id.toString());
+        // console.log(participated);
+        res.status(200).json({...event.toObject(),participated});
     } catch (error) {
         res.status(500).json({error:error.message})
     }
@@ -74,9 +76,33 @@ const getMyPendingEvents = asyncHandler(async (req,res) => {
     }
 })
 
+const confirmUserToEvent =asyncHandler(async (req,res) => {
+    try {
+        // const {eventId} = req.params;
+        const {userId,eventId} = req.body;
+        // console.log(userId,eventId);
+        const user = await User.findByIdAndUpdate(userId,{$push :{participated:eventId},$pull:{pending:eventId}});
+        const event = await Event.findByIdAndUpdate(eventId,{$pull:{pending:userId},$push:{currentParticipants:userId}})
+        res.status(200).json({user,event});
+    } catch (error) {
+        res.status(500).json({error:error.message})
+    }
+})
+const deleteUserFromEvent =asyncHandler(async (req,res) => {
+    try {
+        const {userId,eventId} = req.body;
+        console.log(userId,eventId);
+        const user = await User.findByIdAndUpdate(userId,{$pull:{pending:eventId}});
+        const event = await Event.findByIdAndUpdate(eventId,{$pull:{pending:userId}});
+        res.status(200).json({user,event});
+    } catch (error) {
+        res.status(500).json({error:error.message});
+    }
+})
 const getParticipatedEvents = asyncHandler(async(req,res) => {
     try {
-        const user = await User.findById(req.user._id);
+        const user = await User.findById(req.user._id)
+        // const createdBy = await
         res.status(200).json(user.participated);
     } catch (error) {
         res.status(500).json({error:error.message})
@@ -140,4 +166,4 @@ const cancelJoinEvent = asyncHandler(async (req,res) => {
 })
 
 
-module.exports = { createEvent,getAllEvents,getMyEvents,getEventJoinStatus,requestToJoin,cancelJoinEvent,getMyPendingEvents,getUserInfo,getParticipatedEvents,getSingleEventDetail}
+module.exports = { createEvent,getAllEvents,getMyEvents,getEventJoinStatus,requestToJoin,cancelJoinEvent,getMyPendingEvents,getUserInfo,getParticipatedEvents,getSingleEventDetail,confirmUserToEvent,deleteUserFromEvent}

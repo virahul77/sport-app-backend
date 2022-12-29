@@ -28,7 +28,7 @@ const userModel = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'events'
     }]
-})
+},{strict:false})
 
 const User = mongoose.model('users',userModel);
 

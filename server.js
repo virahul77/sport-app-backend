@@ -27,7 +27,7 @@ app.get('/',(req,res)=> {
 
 const PORT = process.env.PORT || 5000;
 
-mongoose.set('strictQuery', true);
+mongoose.set('strictQuery', false);
 mongoose.connect(process.env.MONGO_URI).then((conn)=>{
     console.log('connected to DB',conn.connection.host);
     app.listen(PORT,()=>{
