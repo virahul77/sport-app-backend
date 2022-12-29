@@ -56,10 +56,7 @@ const getSingleEventDetail = asyncHandler(async (req,res) => {
 
 const getMyEvents = asyncHandler(async (req,res) => {
     try {
-        const events = await Event.find({createdBy:req.user._id}).populate({
-            path:'createdBy',
-            select: 'username'
-        });
+        const events = await Event.find({createdBy:req.user._id}).populate({path:'pending',select:'username'}).populate({path:'currentParticipants',select:'username'});
         res.status(200).json(events)
     } catch (error) {
         res.status(500).json({error:error.message})

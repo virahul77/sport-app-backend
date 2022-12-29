@@ -48,8 +48,8 @@ const eventSchema = new mongoose.Schema({
     image: {
         type: String
     },
-    currentParticipants: [{type:mongoose.Schema.Types.ObjectId,ref:'User'}],
-    pending: [{type:mongoose.Schema.Types.ObjectId,ref:'User'}],
+    currentParticipants: [{type:mongoose.Schema.Types.ObjectId,ref:'users'}],
+    pending: [{type:mongoose.Schema.Types.ObjectId,ref:'users'}],
     startDate: Date,
     venue: String
 })
