@@ -76,20 +76,14 @@ const deletPending = async (req, res) => {
     res.send(event);
 }
 
-const searchEvents = async (req, res) => {
-    const username = req.params.username;
-    const key = req.params.key;
-    const event = await Event.find({
-        "$and": [{ createdBy: { $nin: username } },
-        {
-            "$or": [
-                { eventName: { $regex: key, $options: "i" } },
-                { createdBy: { $regex: key, $options: "i" } },
-            ]
-        }]
-    });
-    res.send(event);
-}
+
+const getUserInfo = asyncHandler(async (req,res)=> {
+    try {
+        res.status(200).json(req.user.username);
+    } catch (error) {
+        res.status(500).json({error:error.message})
+    }
+})
 
 const getAllEvents = asyncHandler(async (req,res)=> {
     // console.log(req.user);
@@ -180,4 +174,4 @@ const cancelJoinEvent = asyncHandler(async (req,res) => {
 })
 
 
-module.exports = { createEvent ,getAllEvents,getMyEvents,getEventJoinStatus,requestToJoin,cancelJoinEvent,getMyPendingEvents}
+module.exports = { createEvent,getAllEvents,getMyEvents,getEventJoinStatus,requestToJoin,cancelJoinEvent,getMyPendingEvents,getUserInfo}
