@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Event = require('../models/eventModel');
+const User = require('../models/userModel');
 
 const images = {
     cricket: "https://wallpaperaccess.com/full/1088580.jpg",
@@ -115,6 +116,17 @@ const getMyEvents = asyncHandler(async (req,res) => {
     }
 })
 
+const getMyPendingEvents = asyncHandler(async (req,res) => {
+    try {
+        // const events = req.user.pending.map(async id=> await Event.findById(id));
+        const user = await User.findById(req.user._id).populate('pending');
+        // console.log(req.user);
+        res.status(200).json(user.pending);
+    } catch (error) {
+        res.status(500).json({error:error.message})
+    }
+})
+
 const requestToJoin = asyncHandler(async (req,res)=> {
     try {
         const {eventId} = req.params;
@@ -157,8 +169,8 @@ const cancelJoinEvent = asyncHandler(async (req,res) => {
         const user = req.user;
         const {eventId} = req.params;
         const event = await Event.findById(eventId);
-        event.pending = event.pending.filter(ev=>ev._id !== user._id);
-        user.pending = user.pending.filter(user=>user._id !== event._id);
+        event.pending = event.pending.filter(ev=>ev.toString() !== user._id.toString());
+        user.pending = user.pending.filter(ev=>ev.toString() !== event._id.toString());
         await event.save();
         await user.save();
         res.status(200).json(event);
@@ -167,4 +179,5 @@ const cancelJoinEvent = asyncHandler(async (req,res) => {
     }
 })
 
-module.exports = { createEvent ,getAllEvents,getMyEvents,getEventJoinStatus,requestToJoin,cancelJoinEvent}
+
+module.exports = { createEvent ,getAllEvents,getMyEvents,getEventJoinStatus,requestToJoin,cancelJoinEvent,getMyPendingEvents}
