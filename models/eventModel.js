@@ -49,7 +49,9 @@ const eventSchema = new mongoose.Schema({
         type: String
     },
     currentParticipants: [{type:mongoose.Schema.Types.ObjectId,ref:'User'}],
-    pending: [{type:mongoose.Schema.Types.ObjectId,ref:'User'}]
+    pending: [{type:mongoose.Schema.Types.ObjectId,ref:'User'}],
+    startDate: Date,
+    venue: String
 })
 
 

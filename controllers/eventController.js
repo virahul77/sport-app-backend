@@ -124,7 +124,7 @@ const getMyPendingEvents = asyncHandler(async (req,res) => {
 const getParticipatedEvents = asyncHandler(async(req,res) => {
     try {
         const user = await User.findById(req.user._id);
-        res.status(200).json(user);
+        res.status(200).json(user.participated);
     } catch (error) {
         res.status(500).json({error:error.message})
     }
