@@ -44,6 +44,16 @@ const getAllEvents = asyncHandler(async (req,res)=> {
     }
 })
 
+const getSingleEventDetail = asyncHandler(async (req,res) => {
+    try {
+        const {eventId} = req.params;
+        const event = await Event.findById(eventId);
+        res.status(200).json(event);
+    } catch (error) {
+        res.status(500).json({error:error.message})
+    }
+})
+
 const getMyEvents = asyncHandler(async (req,res) => {
     try {
         const events = await Event.find({createdBy:req.user._id}).populate({
@@ -133,4 +143,4 @@ const cancelJoinEvent = asyncHandler(async (req,res) => {
 })
 
 
-module.exports = { createEvent,getAllEvents,getMyEvents,getEventJoinStatus,requestToJoin,cancelJoinEvent,getMyPendingEvents,getUserInfo,getParticipatedEvents}
+module.exports = { createEvent,getAllEvents,getMyEvents,getEventJoinStatus,requestToJoin,cancelJoinEvent,getMyPendingEvents,getUserInfo,getParticipatedEvents,getSingleEventDetail}
